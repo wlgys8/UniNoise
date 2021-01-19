@@ -7,6 +7,7 @@ using System.IO;
 namespace MS.Noise.Editor{
 
     public enum NoiseType{
+        White,
         Value,
         Perlin,
         Worley,
@@ -126,6 +127,9 @@ namespace MS.Noise.Editor{
                     case NoiseType.Worley:
                     noise = new WorleyNoise2D(_worleyOptions.distanceAlgorithm,_worleyOptions.maxPointsInCell);
                     break;
+                    case NoiseType.White:
+                    noise = new WhiteNoise2D();
+                    break;
                 }
                 _generatedTexture = _texOutputOptions.ExportNoiseTo(noise);
             }
@@ -161,12 +165,29 @@ namespace MS.Noise.Editor{
         }
 
         public void OnGUI(){
-         }
+        }
 
          
 
     }
 
+    public class WhiteNoiseOptions:IBaseNoiseGenerateOptions{
+
+        public NoiseType type{
+            get{
+                return NoiseType.White;
+            }
+        }
+
+        public INoise2D CreateNoise()
+        {
+            return new WhiteNoise2D();
+        }
+
+        public void OnGUI(){
+        }
+
+    }
 
     public class ValueNoiseOptions:IBaseNoiseGenerateOptions{
 

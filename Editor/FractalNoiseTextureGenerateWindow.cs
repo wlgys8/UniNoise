@@ -80,6 +80,8 @@ namespace MS.Noise.Editor{
                 return new ValueNoiseOptions();
                 case NoiseType.Worley:
                 return new WorleyNoiseOptions();
+                case NoiseType.White:
+                return new WhiteNoiseOptions();
             }
             return null;
         }
