@@ -29,6 +29,8 @@ __Attention: 内置的噪声函数，默认的频次与振幅均为1,满足以�
 
 [Check wiki](https://en.wikipedia.org/wiki/White_noise)
 
+<img src="https://raw.githubusercontent.com/wiki/wlgys8/UniNoise/.imgs/WhiteNoise.jpg" width="300"/>
+
 Usage:
 
 ```csharp
@@ -42,6 +44,7 @@ var result = noise.Evaluate(1,1);
 
 [check wiki](https://en.wikipedia.org/wiki/Value_noise)
 
+<img src="https://raw.githubusercontent.com/wiki/wlgys8/UniNoise/.imgs/ValueNoise.jpg" width="300"/>
 
 Usage:
 
@@ -52,9 +55,14 @@ var result = noise.Evaluate(1,1);
 
 ```
 
+
+
+
 ## PerlinNoise
 
 [wiki](https://en.wikipedia.org/wiki/Perlin_noise)
+
+<img src="https://raw.githubusercontent.com/wiki/wlgys8/UniNoise/.imgs/PerlinNoise.jpg" width="300"/>
 
 ```csharp
 
@@ -65,6 +73,7 @@ var result = noise.Evaluate(1,1);
 
 ## WorleyNoise
 
+<img src="https://raw.githubusercontent.com/wiki/wlgys8/UniNoise/.imgs/WorleyNoise.jpg" width="300"/>
 
 ```csharp
 
