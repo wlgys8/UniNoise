@@ -10,6 +10,7 @@ namespace MS.Noise{
         public int width = 256;
         public int height = 256;
         public int cellSize = 16;
+        public bool markNoLongerReadable = false;
     }
     public static class NoiseTextureExts
     {
@@ -34,7 +35,7 @@ namespace MS.Noise{
             var tex = new Texture2D(options.width,options.height,TextureFormat.RGB24,false,false);
             tex.filterMode = FilterMode.Point;
             tex.SetPixels(colors,0);
-            tex.Apply(false,false);
+            tex.Apply(false,options.markNoLongerReadable);
             return tex;
         }
 
