@@ -39,7 +39,7 @@ namespace MS.Noise.Editor{
                 var type = (NoiseType)EditorGUILayout.EnumPopup("BaseNoiseType",oc.type);
                 if(type != oc.type){
                     _octaves.RemoveAt(i);
-                    oc = CreateNoiseOptionsByType(type);
+                    oc = NoiseEditorUtil.CreateNoiseOptionsByType(type);
                     _octaves.Insert(i,oc);
                 }
                 oc.OnGUI();
@@ -60,7 +60,7 @@ namespace MS.Noise.Editor{
             if(GUILayout.Button("Generate")){
                 List<INoise2D> octaves = new List<INoise2D>();
                 foreach(var o in _octaves){
-                    octaves.Add(o.CreateNoise());
+                    octaves.Add(o.CreateNoise(_texOutputOptions));
                 }
                 var noise = new FractalNoise2D(octaves.ToArray());
                 _generatedNoiseTexture = _texOutputOptions.ExportNoiseTo(noise);
@@ -70,20 +70,6 @@ namespace MS.Noise.Editor{
                 var rect = EditorGUILayout.GetControlRect(GUILayout.Width(256),GUILayout.Height(256));
                 GUI.DrawTexture(rect,_generatedNoiseTexture);
             }
-        }
-
-        private IBaseNoiseGenerateOptions CreateNoiseOptionsByType(NoiseType type){
-            switch(type){
-                case NoiseType.Perlin:
-                return new PerlinNoiseOptions();
-                case NoiseType.Value:
-                return new ValueNoiseOptions();
-                case NoiseType.Worley:
-                return new WorleyNoiseOptions();
-                case NoiseType.White:
-                return new WhiteNoiseOptions();
-            }
-            return null;
         }
 
 

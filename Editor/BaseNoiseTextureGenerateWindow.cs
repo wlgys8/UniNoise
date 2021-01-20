@@ -93,6 +93,9 @@ namespace MS.Noise.Editor{
         private Texture2D _generatedTexture;
 
         private WorleyNoiseOptions _worleyOptions;
+        private PerlinNoiseOptions _perlinOptions;
+
+        private Dictionary<NoiseType, IBaseNoiseGenerateOptions> _noiseOptions = new Dictionary<NoiseType, IBaseNoiseGenerateOptions>();
 
 
 
@@ -105,39 +108,41 @@ namespace MS.Noise.Editor{
             }
 
             _texOutputOptions.OnGUI();
- 
-            switch(_noiseType){
-                case NoiseType.Worley:
-                if(_worleyOptions == null){
-                    _worleyOptions = new WorleyNoiseOptions();
-                }
-                _worleyOptions.OnGUI();
-                break;
+
+            if(!_noiseOptions.ContainsKey(_noiseType)){
+                _noiseOptions.Add(_noiseType,NoiseEditorUtil.CreateNoiseOptionsByType(_noiseType));
             }
 
+            _noiseOptions[_noiseType].OnGUI();
+        
+
             if(GUILayout.Button("Generate")){
-                INoise2D noise = null;
-                switch(_noiseType){
-                    case NoiseType.Value:
-                    noise = new ValueNoise2D();
-                    break;
-                    case NoiseType.Perlin:
-                    noise = new PerlinNoise2D();
-                    break;
-                    case NoiseType.Worley:
-                    noise = new WorleyNoise2D(_worleyOptions.distanceAlgorithm,_worleyOptions.maxPointsInCell);
-                    break;
-                    case NoiseType.White:
-                    noise = new WhiteNoise2D();
-                    break;
-                }
-                _generatedTexture = _texOutputOptions.ExportNoiseTo(noise);
+                var noiseOptions = _noiseOptions[_noiseType];
+                INoise2D noise = noiseOptions.CreateNoise(_texOutputOptions);
+                _generatedTexture =  _texOutputOptions.ExportNoiseTo(noise);
             }
 
             if(_generatedTexture != null){
                 var rect = EditorGUILayout.GetControlRect(GUILayout.Width(256),GUILayout.Height(256));
                 GUI.DrawTexture(rect,_generatedTexture);
             }
+        }
+    }
+
+
+    public static class NoiseEditorUtil{
+        public static IBaseNoiseGenerateOptions CreateNoiseOptionsByType(NoiseType type){
+            switch(type){
+                case NoiseType.Perlin:
+                return new PerlinNoiseOptions();
+                case NoiseType.Value:
+                return new ValueNoiseOptions();
+                case NoiseType.Worley:
+                return new WorleyNoiseOptions();
+                case NoiseType.White:
+                return new WhiteNoiseOptions();
+            }
+            return null;
         }
     }
 
@@ -148,23 +153,38 @@ namespace MS.Noise.Editor{
 
         void OnGUI();
 
-        INoise2D CreateNoise();
+        INoise2D CreateNoise(NoiseTextureOutputOptions texOptions);
     }
 
     public class PerlinNoiseOptions:IBaseNoiseGenerateOptions{
-
+        
+        private bool _loop;
         public NoiseType type{
             get{
                 return NoiseType.Perlin;
             }
         }
 
-        public INoise2D CreateNoise()
+        public bool loop{
+            get{
+                return _loop;
+            }
+        }
+
+        public INoise2D CreateNoise(NoiseTextureOutputOptions texOptions)
         {
-            return new PerlinNoise2D();
+            var loopSize = new Vector2Int(0,0);
+            if(loop){
+                loopSize.x = Mathf.FloorToInt(texOptions.imageSize.x / texOptions.cellSize);
+                loopSize.y = Mathf.FloorToInt(texOptions.imageSize.y / texOptions.cellSize);
+            }
+            return new PerlinNoise2D(new PerlinNoise2D.Options(){
+                loopSize = loopSize
+            });
         }
 
         public void OnGUI(){
+            _loop = EditorGUILayout.Toggle("Loop",_loop);
         }
 
          
@@ -179,7 +199,7 @@ namespace MS.Noise.Editor{
             }
         }
 
-        public INoise2D CreateNoise()
+        public INoise2D CreateNoise(NoiseTextureOutputOptions texOptions)
         {
             return new WhiteNoise2D();
         }
@@ -196,13 +216,24 @@ namespace MS.Noise.Editor{
                 return NoiseType.Value;
             }
         }
+        public bool loop{
+            get;private set;
+        }
 
-        public INoise2D CreateNoise()
+        public INoise2D CreateNoise(NoiseTextureOutputOptions texOptions)
         {
-            return new ValueNoise2D();
+            var options = new ValueNoise2D.Options();
+            var loopSize = new Vector2Int(0,0);
+            if(loop){
+                loopSize.x = Mathf.FloorToInt(texOptions.imageSize.x / texOptions.cellSize);
+                loopSize.y = Mathf.FloorToInt(texOptions.imageSize.y / texOptions.cellSize);
+            }
+            options.loopSize = loopSize;
+            return new ValueNoise2D(options);
         }
 
         public void OnGUI(){
+            loop = EditorGUILayout.Toggle("Loop",loop);
         }
 
     }
@@ -211,20 +242,32 @@ namespace MS.Noise.Editor{
         public DistanceAlgorithm distanceAlgorithm = DistanceAlgorithm.Euclidean;
         public int maxPointsInCell = 3;
 
+        public bool loop{
+            get;private set;
+        }
+
         public NoiseType type{
             get{
                 return NoiseType.Worley;
             }
         }
 
-        public INoise2D CreateNoise()
+        public INoise2D CreateNoise(NoiseTextureOutputOptions texOptions)
         {
-            return new WorleyNoise2D(distanceAlgorithm,maxPointsInCell);
+            var options = new WorleyNoise2D.Options();
+            options.distanceAlgorithm = distanceAlgorithm;
+            options.maxPointsInCell = maxPointsInCell;
+            if(loop){
+                options.loopSize = new Vector2Int(Mathf.FloorToInt(texOptions.imageSize.x/texOptions.cellSize)
+                ,Mathf.FloorToInt(texOptions.imageSize.y/texOptions.cellSize));
+            }
+            return new WorleyNoise2D(options);
         }
 
         public void OnGUI(){
             distanceAlgorithm = (DistanceAlgorithm)EditorGUILayout.EnumPopup("distanceAlgorithm",distanceAlgorithm);
             maxPointsInCell = EditorGUILayout.IntSlider("maxPointsInCell",maxPointsInCell,1,5);
+            loop = EditorGUILayout.Toggle("loop",loop);
         }
     }
 

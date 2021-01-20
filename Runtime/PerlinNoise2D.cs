@@ -5,11 +5,28 @@ using UnityEngine;
 namespace MS.Noise{
     public class PerlinNoise2D:INoise2D
     {
+        private Vector2Int _loopSize;
+
+        public PerlinNoise2D(){
+        }
+
+        public PerlinNoise2D(Options options){
+            _loopSize = options.loopSize;
+        }
+
         public float Evaluate(float x,float y){
             var ix = Mathf.FloorToInt(x);
             var iy = Mathf.FloorToInt(y);
             var fx = x - ix;
             var fy = y - iy;
+
+            var ix1 = ix + 1;
+            var iy1 = iy + 1;
+
+            ix = MathUtility.ModPositive(ix,_loopSize.x);
+            iy = MathUtility.ModPositive(iy,_loopSize.y);
+            ix1 = MathUtility.ModPositive(ix1,_loopSize.x);
+            iy1 = MathUtility.ModPositive(iy1,_loopSize.y);
 
             var p1 = new Vector2(fx,fy);
             var p2 = p1 - new Vector2(1,0);
@@ -17,9 +34,9 @@ namespace MS.Noise{
             var p4 = p1 - new Vector2(1,1);
 
             var hash1 = RandomHash.Get(ix,iy);
-            var hash2 = RandomHash.Get(ix + 1,iy);
-            var hash3 = RandomHash.Get(ix,iy+1);
-            var hash4 = RandomHash.Get(ix + 1,iy+1);
+            var hash2 = RandomHash.Get(ix1,iy);
+            var hash3 = RandomHash.Get(ix,iy1);
+            var hash4 = RandomHash.Get(ix1,iy1);
 
             var g1 = RandomGrad.GetVector(hash1);
             var g2 = RandomGrad.GetVector(hash2);
@@ -34,6 +51,15 @@ namespace MS.Noise{
             var a = MathUtility.SmoothLerp2(v1,v2,fx);
             var b = MathUtility.SmoothLerp2(v3,v4,fx);
             return MathUtility.SmoothLerp2(a,b,fy);
+        }
+
+
+        public class Options{
+
+            /// <summary>
+            /// <=0 means non-loop mode, otherwise noise will be looped in the configurated size. It is useful when you want to generate a Seamless Noise Texture.
+            /// </summary>
+            public Vector2Int loopSize;
         }
        
 

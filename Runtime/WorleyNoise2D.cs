@@ -20,7 +20,13 @@ namespace MS.Noise{
 
         private int _maxPointsInCell;
 
+        private Vector2Int _loopSize;
+
         public WorleyNoise2D():this(DistanceAlgorithm.Euclidean,3){
+        }
+
+        public WorleyNoise2D(Options options):this(options.distanceAlgorithm,options.maxPointsInCell){
+            _loopSize = options.loopSize;
         }
 
         /// <summary>
@@ -53,7 +59,6 @@ namespace MS.Noise{
             }
         }
 
-        private int _printCount = 0;
         public float Evaluate(float x, float y)
         {
             var xy = new Vector2(x,y);
@@ -62,7 +67,9 @@ namespace MS.Noise{
             var minDis = float.MaxValue;
             for(var i = ix - 1;i <= ix + 1; i ++){
                 for(var j = iy - 1;j <= iy + 1; j ++){
-                    var hash = RandomHash.Get(i,j);
+                    var fi = MathUtility.ModPositive(i,_loopSize.x);
+                    var fj = MathUtility.ModPositive(j,_loopSize.y);
+                    var hash = RandomHash.Get(fi,fj);
                     _lcgRandom.Seed = (uint)(hash * (uint.MaxValue >> 9));
                     var checkPointCount = _lcgRandom.NextRange(1,_maxPointsInCell + 1);
                     for(var idx = 0; idx < checkPointCount; idx++){
@@ -74,6 +81,15 @@ namespace MS.Noise{
                 }
             }
             return _distanceNormalize(minDis);
+        }
+
+        public class Options{
+
+            public Vector2Int loopSize;
+
+            public DistanceAlgorithm distanceAlgorithm;
+
+            public int maxPointsInCell;
         }
 
 

@@ -13,7 +13,7 @@ namespace MS.Noise{
     }
 
 
-    public static class MathUtility 
+    internal static class MathUtility 
     {
         
         public static float SmoothLerp2(float a, float b, float t){
@@ -37,6 +37,22 @@ namespace MS.Noise{
         public static float ChebyshevDistance(Vector2 v1,Vector2 v2){
             var d = v2 - v1;
             return Mathf.Max(Mathf.Abs(d.x),Mathf.Abs(d.y));
+        }
+
+        /// <summary>
+        /// if b <= 0, return a;
+        /// if b > 0 and a > 0 then return mod(a,b);
+        /// if b > 0 and a < 0 then return (a%b + b)%b
+        /// </summary>
+        public static int ModPositive(int a,int b){
+            if(b <= 0){
+                return a;
+            }
+            a = a %= b;
+            if(a < 0){
+                a += b;
+            }
+            return a;
         }
     }
 }

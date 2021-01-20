@@ -14,6 +14,8 @@ Unity的噪声函数库，有如下功能:
 
 - 支持调整噪声的频次和震幅.
 
+- 支持生成无缝衔接的噪声贴图
+
 
 
 # 噪声函数介绍
@@ -73,6 +75,8 @@ var result = noise.Evaluate(1,1);
 
 ## WorleyNoise
 
+[wiki](https://en.wikipedia.org/wiki/Worley_noise)
+
 <img src="https://raw.githubusercontent.com/wiki/wlgys8/UniNoise/.imgs/WorleyNoise.jpg" width="300"/>
 
 ```csharp
@@ -82,7 +86,17 @@ var result = noise.Evaluate(1,1);
 
 ```
 
+## Fractal Noise
 
+[wiki](https://en.wikipedia.org/wiki/Fractional_Brownian_motion)
+
+分形噪声是由若干不同频次和振幅的噪声叠加而成的。
+
+```csharp
+
+var noise = new FractalNoise2D(new PerlinNoise2D(),new PerlinNoise2D());
+
+```
 
 
 # 2D噪声贴图生成
