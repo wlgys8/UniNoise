@@ -1,6 +1,6 @@
 # UniNoise
 
-Unity的噪声函数库，有如下功能:
+Unity的噪声函数库(包括c#版本和shader版本)，有如下功能:
 
 - 支持噪声类型:
     - WhiteNoise2D
@@ -16,13 +16,16 @@ Unity的噪声函数库，有如下功能:
 
 - 支持生成无缝衔接的噪声贴图
 
+- 提供Shader版本的噪声函数
+
 
 
 # 噪声函数介绍
 
 __Attention: 内置的噪声函数，默认的频次与振幅均为1,满足以下规范:__
 - 参数分布范围为(-infinite,+infinite)
-- 返回值为(-1,1)
+- c#版本返回值范围为(-1,1)
+- shader版本返回值范围为(0,1)
 
 
 如想获取不同频次和振幅的噪声函数，请使用`TransformedNoise2D(INoise2D source,float frequency,float amplitude)`.
@@ -114,6 +117,33 @@ Texture2D INoise2D.CreateTexture(NoiseTextureGenerateOptions options);
 ```
 
 来创建噪声贴图
+
+
+# Shader版本
+
+
+Shader部分的实现参考了如下的文章(Reference):
+
+https://thebookofshaders.com/10/
+
+
+## Usage
+
+add include in your shader as follow:
+
+```hlsl
+
+#include "Packages/com.ms.noise/Shader/Libaray/Random.hlsl"
+
+.....
+
+
+float4 Frag(Varyings i) : SV_Target{
+    // in fragment, generate noise with input uv.
+    return PerlinNoise(i.uv * 10);
+}
+
+```
 
 
 # 1D噪声调试工具
