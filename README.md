@@ -95,9 +95,18 @@ var result = noise.Evaluate(1,1);
 
 分形噪声是由若干不同频次和振幅的噪声叠加而成的。
 
+下图由3个PerlinNoise叠加而成的分形噪声
+
+<img src="https://raw.githubusercontent.com/wiki/wlgys8/UniNoise/.imgs/FractalNoise.jpg" width="300"/>
+
 ```csharp
 
-var noise = new FractalNoise2D(new PerlinNoise2D(),new PerlinNoise2D());
+var noise = new FractalNoise2D(new PerlinNoise2D(),new PerlinNoise2D(),PerlinNoise2D());
+var noiseTex = noise.CreateTexture(new NoiseTextureGenerateOptions(){
+    width = 512,
+    height = 512,
+    cellSize = 64
+});
 
 ```
 
