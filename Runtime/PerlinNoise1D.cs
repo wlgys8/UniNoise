@@ -5,6 +5,10 @@ using UnityEngine;
 namespace MS.Noise{
     public class PerlinNoise1D : INoise1D
     {
+        private static LCGRandom _random = new LCGRandom(0);
+
+        private static uint magicNumber = uint.MaxValue / 256;
+
         public float Evaluate(float x)
         {
             var ix = Mathf.FloorToInt(x);
@@ -15,8 +19,10 @@ namespace MS.Noise{
             var hash1 = RandomHash.Get(ix);
             var hash2 = RandomHash.Get(ix + 1);
 
-            var g1 = RandomGrad.Get(hash1);
-            var g2 = RandomGrad.Get(hash2);
+            _random.Seed = (uint)(hash1 * magicNumber);
+            var g1 = _random.NextFloat() * 4 - 2;
+            _random.Seed = (uint)(hash2 * magicNumber);
+            var g2 = _random.NextFloat() * 4 - 2;
 
             var v1 = g1 * p1;
             var v2 = g2 * p2;
